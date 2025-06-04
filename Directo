@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Agua para Café</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc; /* Tailwind gray-100 */
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            padding: 2rem; /* p-8 */
+            margin-top: 2.5rem; /* mt-10 */
+        }
+        .input-label {
+            display: block;
+            margin-bottom: 0.5rem; /* mb-2 */
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 500; /* font-medium */
+            color: #374151; /* text-gray-700 */
+        }
+        .input-field {
+            width: 100%;
+            padding: 0.75rem; /* p-3 */
+            border: 1px solid #d1d5db; /* border-gray-300 */
+            border-radius: 0.375rem; /* rounded-md */
+            box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #4f46e5; /* focus:border-indigo-500 */
+            box-shadow: 0 0 0 0.125em #c7d2fe; /* focus:ring-indigo-500 focus:ring-opacity-50 */
+        }
+        .btn-primary {
+            background-color: #4f46e5; /* bg-indigo-600 */
+            color: white;
+            padding: 0.75rem 1.5rem; /* py-3 px-6 */
+            border-radius: 0.375rem; /* rounded-md */
+            font-weight: 600; /* font-semibold */
+            transition: background-color 0.15s ease-in-out;
+            width: 100%;
+        }
+        .btn-primary:hover {
+            background-color: #4338ca; /* hover:bg-indigo-700 */
+        }
+        .results-card {
+            background-color: #eff6ff; /* bg-blue-50 */
+            border: 1px solid #bfdbfe; /* border-blue-200 */
+            border-radius: 0.5rem; /* rounded-lg */
+            padding: 1.5rem; /* p-6 */
+            margin-top: 1.5rem; /* mt-6 */
+        }
+        .results-title {
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600; /* font-semibold */
+            color: #1e40af; /* text-blue-800 */
+            margin-bottom: 1rem; /* mb-4 */
+        }
+        .results-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0; /* py-2 */
+            border-bottom: 1px solid #dbeafe; /* border-blue-100 */
+        }
+        .results-item:last-child {
+            border-bottom: none;
+        }
+        .results-label {
+            font-weight: 500; /* font-medium */
+            color: #1d4ed8; /* text-blue-700 */
+        }
+        .results-value {
+            font-weight: 600; /* font-semibold */
+            color: #1e3a8a; /* text-blue-900 */
+        }
+        /* Custom styles for better mobile experience */
+        @media (max-width: 640px) {
+            .card {
+                margin-left: 1rem; /* ml-4 */
+                margin-right: 1rem; /* mr-4 */
+                padding: 1.5rem; /* p-6 */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 py-8 max-w-2xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800">Calculadora de Agua para Café ☕</h1>
+            <p class="text-gray-600 mt-2">Descubre la cantidad perfecta de agua para tu método de café favorito.</p>
+        </header>
+
+        <main class="card">
+            <div>
+                <label for="cantidadCafe" class="input-label">Cantidad de Café (gramos)</label>
+                <input type="number" id="cantidadCafe" class="input-field" placeholder="Ej: 20" value="20">
+            </div>
+
+            <div class="mt-6">
+                <label for="metodoPreparacion" class="input-label">Método de Preparación</label>
+                <select id="metodoPreparacion" class="input-field">
+                    <option value="v60">V60 / Pour Over</option>
+                    <option value="prensaFrancesa">Prensa Francesa</option>
+                    <option value="aeropress">Aeropress</option>
+                    <option value="chemex">Chemex</option>
+                    <option value="goteoAutomatico">Goteo Automático</option>
+                    <option value="coldBrew">Cold Brew (Concentrado)</option>
+                </select>
+            </div>
+            
+            <div class="mt-6">
+                <label for="ratioPersonalizado" class="input-label">
+                    Ratio Agua:Café Personalizado (Opcional)
+                    <span class="text-xs text-gray-500 block">Si se deja vacío, se usará el ratio recomendado. Ej: 16 (para 1:16)</span>
+                </label>
+                <input type="number" id="ratioPersonalizado" class="input-field" placeholder="Ej: 16">
+            </div>
+
+            <div class="mt-8">
+                <button id="calcularBtn" class="btn-primary">Calcular Agua</button>
+            </div>
+
+            <div id="resultados" class="results-card hidden">
+                <h2 class="results-title">Resultados de la Preparación:</h2>
+                <div id="aguaTotalResultado" class="results-item">
+                    <span class="results-label">Agua Total Necesaria:</span>
+                    <span class="results-value"></span>
+                </div>
+                <div id="ratioUtilizado" class="results-item">
+                    <span class="results-label">Ratio Utilizado (Agua:Café):</span>
+                    <span class="results-value"></span>
+                </div>
+                <div id="aguaBloomResultado" class="results-item hidden">
+                    <span class="results-label">Agua para Bloom (Preinfusión):</span>
+                    <span class="results-value"></span>
+                </div>
+                <div id="aguaVertidoPrincipalResultado" class="results-item hidden">
+                    <span class="results-label">Agua para Vertido Principal:</span>
+                    <span class="results-value"></span>
+                </div>
+            </div>
+            <div id="mensajeError" class="mt-4 text-red-600 text-sm hidden"></div>
+        </main>
+
+        <footer class="text-center mt-12 mb-6">
+            <p class="text-gray-500 text-sm">Creado con ❤️ para los amantes del café.</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- DOM Elements ---
+        const cantidadCafeEl = document.getElementById('cantidadCafe');
+        const metodoPreparacionEl = document.getElementById('metodoPreparacion');
+        const ratioPersonalizadoEl = document.getElementById('ratioPersonalizado');
+        const calcularBtn = document.getElementById('calcularBtn');
+        const resultadosEl = document.getElementById('resultados');
+        const aguaTotalResultadoEl = document.getElementById('aguaTotalResultado').querySelector('.results-value');
+        const ratioUtilizadoEl = document.getElementById('ratioUtilizado').querySelector('.results-value');
+        
+        const aguaBloomItemEl = document.getElementById('aguaBloomResultado');
+        const aguaBloomResultadoEl = aguaBloomItemEl.querySelector('.results-value');
+        
+        const aguaVertidoPrincipalItemEl = document.getElementById('aguaVertidoPrincipalResultado');
+        const aguaVertidoPrincipalResultadoEl = aguaVertidoPrincipalItemEl.querySelector('.results-value');
+        
+        const mensajeErrorEl = document.getElementById('mensajeError');
+
+        // --- Default Ratios and Bloom Info ---
+        // Structure: { ratio: number, hasBloom: boolean, bloomMultiplier: number (e.g., 2 for 2x coffee weight) }
+        const metodosInfo = {
+            v60: { ratio: 16, hasBloom: true, bloomMultiplier: 2.5 }, // Common bloom is 2x to 3x coffee weight
+            prensaFrancesa: { ratio: 14, hasBloom: false },
+            aeropress: { ratio: 15, hasBloom: false }, // Highly variable, can have bloom depending on recipe
+            chemex: { ratio: 16, hasBloom: true, bloomMultiplier: 2.5 },
+            goteoAutomatico: { ratio: 17, hasBloom: false }, // Some machines do a pre-wetting phase
+            coldBrew: { ratio: 5, hasBloom: false } // For concentrate, typically 1:4 to 1:8
+        };
+
+        // --- Event Listener ---
+        calcularBtn.addEventListener('click', calcularAgua);
+        metodoPreparacionEl.addEventListener('change', actualizarPlaceholderRatio);
+        
+        // Initialize placeholder on load
+        actualizarPlaceholderRatio();
+
+        // --- Functions ---
+        function actualizarPlaceholderRatio() {
+            const metodoSeleccionado = metodoPreparacionEl.value;
+            if (metodosInfo[metodoSeleccionado]) {
+                const ratioRecomendado = metodosInfo[metodoSeleccionado].ratio;
+                ratioPersonalizadoEl.placeholder = `Recomendado: ${ratioRecomendado} (para 1:${ratioRecomendado})`;
+            } else {
+                ratioPersonalizadoEl.placeholder = `Ej: 16`;
+            }
+        }
+
+        function mostrarError(mensaje) {
+            mensajeErrorEl.textContent = mensaje;
+            mensajeErrorEl.classList.remove('hidden');
+            resultadosEl.classList.add('hidden');
+        }
+
+        function limpiarError() {
+            mensajeErrorEl.textContent = '';
+            mensajeErrorEl.classList.add('hidden');
+        }
+
+        function calcularAgua() {
+            limpiarError();
+            const cantidadCafe = parseFloat(cantidadCafeEl.value);
+            const metodoSeleccionado = metodoPreparacionEl.value;
+            const ratioPersonalizado = parseFloat(ratioPersonalizadoEl.value);
+
+            if (isNaN(cantidadCafe) || cantidadCafe <= 0) {
+                mostrarError('Por favor, ingresa una cantidad de café válida (mayor que 0).');
+                return;
+            }
+
+            if (!metodosInfo[metodoSeleccionado]) {
+                mostrarError('Por favor, selecciona un método de preparación válido.');
+                return;
+            }
+
+            let ratioFinal = metodosInfo[metodoSeleccionado].ratio;
+            if (!isNaN(ratioPersonalizado) && ratioPersonalizado > 0) {
+                ratioFinal = ratioPersonalizado;
+            } else if (!isNaN(ratioPersonalizado) && ratioPersonalizado <= 0) {
+                 mostrarError('El ratio personalizado debe ser un número positivo.');
+                return;
+            }
+
+
+            const aguaTotal = cantidadCafe * ratioFinal;
+            
+            // Display results
+            aguaTotalResultadoEl.textContent = `${aguaTotal.toFixed(1)} ml`;
+            ratioUtilizadoEl.textContent = `1:${ratioFinal}`;
+
+            // Handle bloom
+            const infoMetodo = metodosInfo[metodoSeleccionado];
+            if (infoMetodo.hasBloom) {
+                const aguaBloom = cantidadCafe * infoMetodo.bloomMultiplier;
+                const aguaVertidoPrincipal = aguaTotal - aguaBloom;
+
+                aguaBloomResultadoEl.textContent = `${aguaBloom.toFixed(1)} ml`;
+                aguaVertidoPrincipalResultadoEl.textContent = `${aguaVertidoPrincipal.toFixed(1)} ml`;
+                
+                aguaBloomItemEl.classList.remove('hidden');
+                aguaVertidoPrincipalItemEl.classList.remove('hidden');
+            } else {
+                aguaBloomItemEl.classList.add('hidden');
+                aguaVertidoPrincipalItemEl.classList.add('hidden');
+            }
+
+            resultadosEl.classList.remove('hidden');
+        }
+
+        // Initial calculation if there's a default coffee amount
+        // calcularAgua(); // Uncomment if you want an initial calculation on page load with default values
+    </script>
+</body>
+</html> 
